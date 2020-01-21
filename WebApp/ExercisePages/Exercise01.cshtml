@@ -1,8 +1,93 @@
 ﻿@{
     Layout = "~/_Layout.cshtml";
-    Page.Title = string.Format("Razor - {0}", "Exercise 01");
+    Page.Title = "Exercise01: Basic form Processing";
+    var customerName = Request.Form["nameEntry"];
+    var thebutton = Request.Form["theButton"];
+
+    string choices = "";
 }
 
 @section banner {
     <h1>@Page.Title</h1>
 }
+
+@if (IsPost)
+{
+    //this true path is done IF this page is returning
+    //from the previous sending
+
+    //IF you have multiple buttons on your form, you SHOULD
+    //determine which button was pressed; thus; dictating WHICH
+    //logic is to be EXECUTED
+    if (thebutton.Equals("submit"))
+    {
+        //the Press Me button was pressed
+        if (string.IsNullOrEmpty(customerName))
+        {
+            <p>You should enter your name.</p>
+        }
+        else
+        {
+            <p>Well: Hello there @customerName</p>
+        }
+    }
+    else
+    {
+        //the Clear button was pressed
+        customerName = "";
+        <p>Use pressed the clear button</p>
+    }
+}
+
+<form id="EX01" method="post">
+    <div class="row">
+        <div class="col-md-3">
+            <p>Customer Name: </p>
+            <br />
+            <input type="text" name="nameEntry" value="@customerName" />
+        </div>
+        <div class="col-md-9">
+            <label>Choose your meal items:</label><br />
+            <input type="checkbox" id="MealGroup" name="MealGroup" value="Steak"
+                   @(Array.IndexOf(choices.Split(','), "Steak") >= 0 ? "checked" : "") />Steak<br />
+            <input type="checkbox" id="MealGroup" name="MealGroup" value="Seafood"
+                   @(Array.IndexOf(choices.Split(','), "Seafood") >= 0 ? "checked" : "") />Seafood<br />
+            <input type="checkbox" id="MealGroup" name="MealGroup" value="Vegetables"
+                   @(Array.IndexOf(choices.Split(','), "Vegetables") >= 0 ? "checked" : "") />Vegetables<br />
+        </div>
+    </div>
+    <div class="row"></div>
+</form>
+
+@*<form id="EX01" method="post">
+    <div class="row">
+        <div class="col">
+            <label id="label1" for="dataentry">Customer name: </label>
+            <br />
+            <input type="text" id="dataentry" name="dataentry"
+                   value="@myname" />
+        </div>
+        <div class="col">
+            <label id="lblGameGroup">Choice your meal items:</label><br />
+            <input type="checkbox" id="MealGroup" name="MealGroup" value="Steak"
+                   @(Array.IndexOf(choices.Split(','), "Steak") >= 0 ? "checked" : "") />Steak<br />
+            <input type="checkbox" id="MealGroup" name="MealGroup" value="Seafood"
+                   @(Array.IndexOf(choices.Split(','), "Seafood") >= 0 ? "checked" : "") />Seafood<br />
+            <input type="checkbox" id="MealGroup" name="MealGroup" value="Vegetables"
+                   @(Array.IndexOf(choices.Split(','), "Vegetables") >= 0 ? "checked" : "") />Vegetables<br />
+        </div>
+    </div>
+    <br /><br />
+    <div class="row">
+        <div class="offset-1">
+            <button type="submit" id="theButton" name="theButton"
+                    value="submit" class="btn btn-primary">
+                Submit
+            </button>&nbsp;&nbsp;
+            <button type="submit" id="theButton" name="theButton"
+                    value="reset" class="btn btn-light">
+                Reset
+            </button>
+        </div>
+    </div>
+</form>*@
