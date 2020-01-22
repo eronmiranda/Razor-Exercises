@@ -4,7 +4,7 @@
     var customerName = Request.Form["nameEntry"];
     var thebutton = Request.Form["theButton"];
 
-    string choices = "";
+    string mealChoices = "";
 }
 
 @section banner {
@@ -24,18 +24,28 @@
         //the Press Me button was pressed
         if (string.IsNullOrEmpty(customerName))
         {
-            <p>You should enter your name.</p>
+            <p style="color:firebrick">Please enter your name.</p>
+        }
+        else if (mealChoices.IsEmpty())
+        {
+            <p style="color:firebrick">Please choose one or more meals.</p>
         }
         else
         {
-            <p>Well: Hello there @customerName</p>
+            <p>@customerName, I see that you have the following meal entries:</p>
+            <ul>
+                @foreach (var meal in mealChoices.Split(','))
+                {
+                    <li>@meal</li>
+                }
+            </ul>
         }
     }
     else
     {
         //the Clear button was pressed
         customerName = "";
-        <p>Use pressed the clear button</p>
+        mealChoices = "";
     }
 }
 
@@ -49,45 +59,21 @@
         <div class="col-md-9">
             <label>Choose your meal items:</label><br />
             <input type="checkbox" id="MealGroup" name="MealGroup" value="Steak"
-                   @(Array.IndexOf(choices.Split(','), "Steak") >= 0 ? "checked" : "") />Steak<br />
+                   @(Array.IndexOf(mealChoices.Split(','), "Steak") >= 0 ? "checked" : "") />Steak<br />
             <input type="checkbox" id="MealGroup" name="MealGroup" value="Seafood"
-                   @(Array.IndexOf(choices.Split(','), "Seafood") >= 0 ? "checked" : "") />Seafood<br />
+                   @(Array.IndexOf(mealChoices.Split(','), "Seafood") >= 0 ? "checked" : "") />Seafood<br />
             <input type="checkbox" id="MealGroup" name="MealGroup" value="Vegetables"
-                   @(Array.IndexOf(choices.Split(','), "Vegetables") >= 0 ? "checked" : "") />Vegetables<br />
+                   @(Array.IndexOf(mealChoices.Split(','), "Vegetables") >= 0 ? "checked" : "") />Vegetables<br />
         </div>
     </div>
-    <div class="row"></div>
+    <div class="row">
+        <button type="submit" id="theButton" name="theButton"
+                value="submit" class="btn btn-primary">
+            Submit
+        </button>&nbsp;&nbsp;
+        <button type="submit" id="theButton" name="theButton"
+                value="reset" class="btn btn-secondary">
+            Reset
+        </button>
+    </div>
 </form>
-
-@*<form id="EX01" method="post">
-    <div class="row">
-        <div class="col">
-            <label id="label1" for="dataentry">Customer name: </label>
-            <br />
-            <input type="text" id="dataentry" name="dataentry"
-                   value="@myname" />
-        </div>
-        <div class="col">
-            <label id="lblGameGroup">Choice your meal items:</label><br />
-            <input type="checkbox" id="MealGroup" name="MealGroup" value="Steak"
-                   @(Array.IndexOf(choices.Split(','), "Steak") >= 0 ? "checked" : "") />Steak<br />
-            <input type="checkbox" id="MealGroup" name="MealGroup" value="Seafood"
-                   @(Array.IndexOf(choices.Split(','), "Seafood") >= 0 ? "checked" : "") />Seafood<br />
-            <input type="checkbox" id="MealGroup" name="MealGroup" value="Vegetables"
-                   @(Array.IndexOf(choices.Split(','), "Vegetables") >= 0 ? "checked" : "") />Vegetables<br />
-        </div>
-    </div>
-    <br /><br />
-    <div class="row">
-        <div class="offset-1">
-            <button type="submit" id="theButton" name="theButton"
-                    value="submit" class="btn btn-primary">
-                Submit
-            </button>&nbsp;&nbsp;
-            <button type="submit" id="theButton" name="theButton"
-                    value="reset" class="btn btn-light">
-                Reset
-            </button>
-        </div>
-    </div>
-</form>*@
