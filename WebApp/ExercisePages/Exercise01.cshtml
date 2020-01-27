@@ -13,12 +13,7 @@
 
 @if (IsPost)
 {
-    //this true path is done IF this page is returning
-    //from the previous sending
-
-    //IF you have multiple buttons on your form, you SHOULD
-    //determine which button was pressed; thus; dictating WHICH
-    //logic is to be EXECUTED
+    mealChoices = Request.Form["MealGroup"];
     if (thebutton.Equals("submit"))
     {
         //the Press Me button was pressed
@@ -53,7 +48,6 @@
     <div class="row">
         <div class="col-md-3">
             <p>Customer Name: </p>
-            <br />
             <input type="text" name="nameEntry" value="@customerName" />
         </div>
         <div class="col-md-9">
@@ -66,14 +60,17 @@
                    @(Array.IndexOf(mealChoices.Split(','), "Vegetables") >= 0 ? "checked" : "") />Vegetables<br />
         </div>
     </div>
+
     <div class="row">
-        <button type="submit" id="theButton" name="theButton"
-                value="submit" class="btn btn-primary">
-            Submit
-        </button>&nbsp;&nbsp;
-        <button type="submit" id="theButton" name="theButton"
-                value="reset" class="btn btn-secondary">
-            Reset
-        </button>
+        <div class="col-md-3">
+            <button type="submit" id="theButton" name="theButton"
+                    value="submit" class="btn btn-primary">
+                Submit
+            </button>&nbsp;&nbsp;
+            <button type="submit" id="theButton" name="theButton"
+                    value="reset" class="btn btn-secondary">
+                Reset
+            </button>
+        </div>
     </div>
 </form>
