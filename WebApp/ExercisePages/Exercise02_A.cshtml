@@ -1,24 +1,21 @@
-﻿@using WebMatrix.Data;
-@{
+﻿@{
     Layout = "~/_Layout.cshtml";
     Page.Title = string.Format("Razor - {0}", "Exercise02_A");
 
     //output variable
 
-    int artistId = 0;
-
     var artistNameArg = Request.Form["ArtistArg"];
     var theButton = Request.Form["theButton"];
 
-    var db = Database.Open("CHB");
+    var db = Database.Open("ChinookDB");
 
     var partialString = "%" + artistNameArg + "%";
 
     var sqlcommand = @"select ArtistId
-               from Artists
-               where Name like @0";
+       from Artists
+       where Name like @0";
 
-    var results = db.QuerySingle(sqlcommand, partialString);
+    var results = db.Query(sqlcommand, partialString);
 }
 
 @section banner {
@@ -34,32 +31,14 @@
     }
     else
     {
-        //always check if you even have results
-
-        //checking for query results DEPEND on how the query was executed
-        // a) and c)   check for null
-        // b) check the .Count of the results
-
-        //a primary key lookup returns either the record or nothing
-
-        if (results == null)
+        if (results.Count() == 0)
         {
             <p style="color:firebrick">There was no record returned from the Data Base</p>
             artistNameArg = "";
         }
         else
         {
-            <p style="color:darkgreen">There was a record returned from the Data Base</p>
-
-            //accessing the data out of your results
-            //there is 2 ways to access data on a result row
-            //a) using an index     syntax  result[index] where index value starts at
-            //                        0 which is the first column on the select
-            //b) using the Property Name    syntax result.PropertyName where the
-            //                        property name is the column title
-
-            //data returned has a datatype that matches the Property
-            artistId = results.ArtistId;
+            Response.Redirect("Exercise02_B.cshtml?ArtistId=" + results);
         }
     }
 }
@@ -86,12 +65,6 @@ else
                         value="reset" class="btn btn-light">
                     Reset
                 </button>
-            </div>
-        </div>
-        <div class="col-3">
-            <div class="offset-1">
-                <label id="lblArtistId">Artist ID:</label>&nbsp;&nbsp;
-                <label id="ArtistId">@artistId</label>
             </div>
         </div>
     </div>
