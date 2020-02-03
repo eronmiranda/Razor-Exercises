@@ -1,10 +1,11 @@
 ﻿@{
     Layout = "~/_Layout.cshtml";
-    Page.Title = string.Format("Razor - {0}", "Exercise02_B");
+    Page.Title = string.Format("Exercise02_B - Database Query");
 
-    var artistID = Request.QueryString["ArtistID"];
+    var artistNameArg = Request.QueryString["artistArg"];
+    var theButton = Request.Form["theButton"];
 
-    if(artistID.Count() == 0)
+    if (string.IsNullOrEmpty(artistNameArg))
     {
         Response.Redirect("Exercise02_A.cshtml");
     }
@@ -13,13 +14,29 @@
 
     var artistQuery = @"select ArtistId, Name
                         from Artists
-                        where ArtistID = @0";
+                        where Name like @0";
+    var partialString = "%" + artistNameArg + "%";
 
-    var artistInfo = db.Query(artistQuery, artistID);
+    var artistInfo = db.Query(artistQuery, partialString);
+    if (artistInfo.Count() == 0)
+    {
+        <p style="color:firebrick">There was no record returned from the Data Base</p>
+    }
+    else
+    {
+        <p style="color:darkgreen">There was @artistInfo.Count() record/s returned from the Data Base</p>
+
+    }
 }
 
 @section banner {
     <h1>@Page.Title</h1>
+}
+
+@if (IsPost)
+{
+    var choice = Request.Form["ArtistList"];
+    Response.Redirect("Exercise02_C.cshtml?artistId=" + choice);
 }
 
 <form id="theform" method="post">
@@ -43,7 +60,7 @@
         &nbsp;&nbsp;
         <button type="submit" id="theButton" name="theButton" value="submit"
                 class="btn btn-primary">
-            View Category Products ...
+            Fetch Album
         </button>
     </div>
 </form>

@@ -1,10 +1,10 @@
 ﻿@{
     Layout = "~/_Layout.cshtml";
-    Page.Title = string.Format("Razor - {0}", "Exercise02_A");
+    Page.Title = string.Format("Exercise02_A - Database Query");
 
     //output variable
 
-    var artistNameArg = Request.Form["ArtistArg"];
+    var artistNameArg = Request.Form["artistArg"];
     var theButton = Request.Form["theButton"];
 
     var db = Database.Open("ChinookDB");
@@ -38,7 +38,7 @@
         }
         else
         {
-            Response.Redirect("Exercise02_B.cshtml?ArtistId=" + results);
+            Response.Redirect("Exercise02_B.cshtml?artistArg=" + artistNameArg);
         }
     }
 }
@@ -53,8 +53,8 @@ else
     <div class="row">
         <div class="col-3">
             <div class="offset-1">
-                <label id="lblArtistArg" for="ArtistArg">Enter an Artist name:</label>&nbsp;&nbsp;
-                <input type="text" id="ArtistArg" name="ArtistArg"
+                <label id="lblArtistArg" for="artistArg">Enter an Artist name:</label>&nbsp;&nbsp;
+                <input type="text" id="artistArg" name="artistArg"
                        value="@artistNameArg" placeholder="artist name" />
                 <br /><br />
                 <button type="submit" id="theButton" name="theButton"

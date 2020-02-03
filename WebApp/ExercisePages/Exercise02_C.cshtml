@@ -1,8 +1,51 @@
 ﻿@{
     Layout = "~/_Layout.cshtml";
-    Page.Title = string.Format("Razor - {0}", "Exercise02_C");
+    Page.Title = string.Format("Exercise02_C - Database Query");
+
+    var artistId = Request.QueryString["artistId"];
+    if (artistId == null || artistId.Count() == 0)
+    {
+        Response.Redirect("Exercise02_A.cshtml");
+    }
+
+    var db = Database.Open("ChinookDB");
+
+    var artistQuery = @"select Name
+        from Artists
+        where ArtistId = @0";
+    var artistName = db.QueryValue(artistQuery, artistId);
+
+    var albumQuery = @"SELECT AlbumId, Title, ReleaseYear, ReleaseLabel
+       FROM Albums
+       WHERE ArtistId = @0
+       ORDER BY Title";
+    var albumList = db.Query(albumQuery, artistId);
+
+    var gridInstance = new WebGrid(albumList, rowsPerPage: 10);
+
 }
 
 @section banner {
     <h1>@Page.Title</h1>
 }
+
+@if (albumList.Count() == 0)
+{
+    <p style="color:firebrick">There was no record returned from the Data Base</p>
+}
+<div class="offset-1">
+    <h3 class="col-8">Albums of @artistName</h3>
+    <div class="col-11">
+        @gridInstance.GetHtml(
+            tableStyle: "table table-striped table-bordered table-hover",
+            mode: WebGridPagerModes.All,
+            firstText: "Start",
+            lastText: "End",
+            columns: gridInstance.Columns(
+               gridInstance.Column(columnName: "AlbumId", header: "ID"),
+               gridInstance.Column(columnName: "Title", header: "Title"),
+               gridInstance.Column(columnName: "ReleaseYear", header: "Released"),
+               gridInstance.Column(columnName: "ReleaseLabel", header: "Label"))
+            )
+    </div>
+</div>
