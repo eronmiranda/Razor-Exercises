@@ -13,8 +13,8 @@
     var db = Database.Open("ChinookDB");
 
     var artistQuery = @"select ArtistId, Name
-                        from Artists
-                        where Name like @0";
+                from Artists
+                where Name like @0";
     var partialString = "%" + artistNameArg + "%";
 
     var artistInfo = db.Query(artistQuery, partialString);
@@ -36,7 +36,16 @@
 @if (IsPost)
 {
     var choice = Request.Form["ArtistList"];
-    Response.Redirect("Exercise02_C.cshtml?artistId=" + choice);
+
+    if (int.Parse(choice) != 0)
+    {
+        Response.Redirect("Exercise02_C.cshtml?artistId=" + choice);
+    }
+    else
+    {
+        <p style="color:firebrick">Please select an Artist name.</p>
+    }
+
 }
 
 <form id="theform" method="post">
@@ -44,16 +53,9 @@
         <label id="lblArtistList" for="ArtistList">Select artist name to view:</label>
         &nbsp;&nbsp;
         <select id="ArtistList" name="ArtistList">
-            <option value="0">select ....</option>
+            <option value="0">select Artist ....</option>
             @foreach (var artist in artistInfo)
             {
-                //walk through the record collection of Category records
-                //for each record in the collection you will create an option line
-                //the display text will be the CategoryName
-                //the value attribute will use the CategoryID (FKey on Products)
-                //reminder of data access on a record
-                // a) index   syntax item[index]
-                // b) property name  syntax item.PropertyName (column title on the SQL select)
                 <option value="@artist.ArtistId">@artist.Name</option>
             }
         </select>
