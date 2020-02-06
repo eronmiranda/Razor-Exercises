@@ -112,7 +112,7 @@ order by Name";
             @Html.ValidationMessage("TitleName")
         </div>
         <div class="row offset-1">
-            <label class="label" for="ArtistList">Supplier:</label>&nbsp;&nbsp;
+            <label class="label" for="ArtistList">Artist:</label>&nbsp;&nbsp;
             <span>@Html.DropDownList("ArtistList", artistList)</span>
             @Html.ValidationMessage("ArtistList")
         </div>
@@ -123,7 +123,7 @@ order by Name";
         </div>
         <div class="row offset-1">
             <label class="label" for="ReleaseLabel">Label:</label>&nbsp;&nbsp;
-            <span>@Html.TextBox("ReleaseLabel", releaseYear)</span>
+            <span>@Html.TextBox("ReleaseLabel", releaseLabel)</span>
             @Html.ValidationMessage("ReleaseLabel")
         </div>
         <div class="row offset-1">
