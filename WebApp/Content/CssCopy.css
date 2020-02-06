@@ -1,0 +1,19 @@
+﻿input,
+select {
+    margin-bottom: 3px;
+}
+
+.validation-summary-errors {
+    border: 2px solid #ffd800;
+    color: red;
+}
+
+.field-validation-error {
+    color: red;
+}
+
+.input-validation-error {
+    background-color: lightyellow;
+    border-top: 2px solid #990099;
+    border-left: 2px solid #990099;
+}

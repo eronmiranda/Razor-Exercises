@@ -2,38 +2,59 @@
     Layout = "~/_Layout.cshtml";
     Page.Title = string.Format("Exercise03 - Database Data Entry");
 
-    var db = Database.Open("ChinookDB");
-    var artistQuery = @"select ArtistId, Name
-                from Artists
-                order by Name";
-
     var title = "";
     var artistId = "0";
     var releaseYear = "";
     var releaseLabel = "";
 
-    var artistList = db.Query(artistQuery);
+    var db = Database.Open("ChinookDB");
+    var artistQuery = @"select ArtistId, Name
+from Artists
+order by Name";
+
+    var artistRecords = db.Query(artistQuery);
+
+    List<SelectListItem> artistList = new List<SelectListItem>();
+    artistList.Add(new SelectListItem
+    {
+        Value = "0",
+        Text = "select..."
+    });
+
+    foreach (var record in artistRecords)
+    {
+        artistList.Add(new SelectListItem
+        {
+            Value = record.ArtistId.ToString(),
+            Text = record.Name
+        });
+    }
 
 
-
-    Validation.Add("Title",
-                    Validator.Required("Title is required"),
-                    Validator.StringLength(160,1, "Title name is limited to 160 characters."));
-    Validation.Add("ArtistId",
-                    Validator.Required("Artist name is required."));
+    Validation.Add("TitleName",
+                    Validator.Required("Title is required."),
+                    Validator.StringLength(160, 0, "Title name is limited to 160 characters."));
+    Validation.Add("ArtistList",
+                    Validator.Range(1, artistList.Count(), "You must select an Artist name"));
     Validation.Add("ReleaseYear",
-                    Validator.Required("Release Year is required."),
-                    Validator.Integer("Release Year must be a number"),
-                    Validator.Range(1950,DateTime.Today.Year, $"Release Year must be between 1950 and {DateTime.Today.Year}."));
+                    Validator.Required("Year is required."),
+                    Validator.Integer("Year must be a number"),
+                    Validator.Range(1950, DateTime.Today.Year, $"Year must be between 1950 and {DateTime.Today.Year}."));
     Validation.Add("ReleaseLabel",
-                    Validator.Required("Release Label is required."),
-                    Validator.StringLength(150,1,"Release Label is limited to 150 characters."));
+                    Validator.Required("Label is required."),
+                    Validator.StringLength(150, 0, "Label is limited to 150 characters."));
+}
+
+@section head{
+    <link href="~/Content/CssCopy.css" rel="stylesheet" />
 }
 
 @section banner {
     <h1>@Page.Title</h1>
 }
-@if(IsPost)
+
+
+@if (IsPost)
 {
     title = Request.Form["TitleName"];
     artistId = Request.Form["ArtistList"];
@@ -50,93 +71,62 @@
     }
     else
     {
-        if(Validation.IsValid())
+        if (Validation.IsValid())
         {
-            var valid = true;
-            if(artistId.Equals("0"))
+            try
             {
-                valid = false;
-                <div class="col-md-12 text-center">
-                    <p style="color:firebrick">
-                        You must select an artist name
+                var insertAlbumCommand = @"insert into Albums (Title, ArtistId, ReleaseYear, ReleaseLabel)
+                                values (@0,@1,@2,@3)";
+                db.Execute(insertAlbumCommand, title,
+                    artistId.Equals("0") ? null : artistId,
+                    string.IsNullOrEmpty(releaseYear) ? null : releaseYear,
+                    string.IsNullOrEmpty(releaseLabel) ? null : releaseLabel); //insert arguments.
+                <div class="col-12 text-center">
+                    <p style="color:green">
+                        Album has been added.
                     </p>
                 </div>
             }
-            if (valid)
+            catch (Exception ex)
             {
-                try
-                {
-                    var insertAlbumCommand = @"insert into Albums (Title, ArtistId, ReleaseYear, ReleaseLabel)
-                                             values (@0,@1,@2,@3)";
-                    db.Execute(insertAlbumCommand, title,
-                        artistId.Equals("0") ? null : artistId,
-                        releaseYear,
-                        releaseLabel); //insert arguments.
-                    <div class="col-12 text-center">
-                        <p style="color:green">
-                            Album has been added
-                        </p>
-                    </div>
-                }
-                catch (Exception ex)
-                {
-                    <div class="col-12 text-center">
-                        <p style="color:firebrick; font-size: large">
-                            Processing error: @ex.Message
-                        </p>
-                    </div>
-                }
+                <div class="col-12 text-center">
+                    <p style="color:firebrick; font-size: large">
+                        Processing error: @ex.Message
+                    </p>
+                </div>
             }
         }
     }
 }
 
-
-@Html.ValidationSummary()
-<form id="theForm" method="post">
-    <div class="row">
-        <div class="col-md-6 text-right">
-
-            <label for="TitleName">Title:</label><br />
-            <label for="ArtistId">Artist:</label><br />
-            <label for="ReleaseYear">Year:</label><br />
-            <label for="ReleaseLabel">Label:</label><br />
-            <br />
-        </div>
-        <div class="col-md-6 text-left">
-
-            <input type="text" value="@title"
-                   id="TitleName" name="TitleName"/>
-            <br />
-            <select id="ArtistList" name="SupplierList">
-                <option value="0">select supplier...</option>
-                @foreach (var artist in artistList)
-                {
-                    //for the select control, the default display on an event
-                    //   is the 1st option tag
-                    //to retain the option selected between posts, you need to
-                    //   set the selected option using the attribute selected
-                    if (artistId == artist.ArtistId.ToString())
-                    {
-                        <option value="@artist.ArtistId" selected>@artist.Name</option>
-                    }
-                    else
-                    {
-                        <option value="@artist.ArtistId">@artist.Name</option>
-                    }
-
-                }
-            </select>
-            <br />
-            <input type="number" id="ReleaseYear" name="ReleaseYear"
-                   value="@releaseYear" min="1950" max="@DateTime.Today.Year"/><br />
-            <input type="text" id="ReleaseLabel" name="ReleaseLabel"
-                   value="@releaseLabel"/><br />
-            <br />
-        </div>
+<fieldset>
+    <legend class="row offset-1">Enter Album</legend>
+    <div class="row row-cols-2 offset-1">
+        @Html.ValidationSummary()
     </div>
-    <div class="row">
-        <div class="col-md-12 text-center">
+    <br />
+    <form id="theform" method="post">
+        <div class="row offset-1">
+            <label class="label" for="TitleName">Title:</label>&nbsp;&nbsp;
+            <span>@Html.TextBox("TitleName", title)</span>
+            @Html.ValidationMessage("TitleName")
+        </div>
+        <div class="row offset-1">
+            <label class="label" for="ArtistList">Supplier:</label>&nbsp;&nbsp;
+            <span>@Html.DropDownList("ArtistList", artistList)</span>
+            @Html.ValidationMessage("ArtistList")
+        </div>
+        <div class="row offset-1">
+            <label class="label" for="ReleaseYear">Year:</label>&nbsp;&nbsp;
+            <span>@Html.TextBox("ReleaseYear", releaseYear)</span>
+            @Html.ValidationMessage("ReleaseYear")
+        </div>
+        <div class="row offset-1">
+            <label class="label" for="ReleaseLabel">Label:</label>&nbsp;&nbsp;
+            <span>@Html.TextBox("ReleaseLabel", releaseYear)</span>
+            @Html.ValidationMessage("ReleaseLabel")
+        </div>
+        <div class="row offset-1">
             <button type="submit" id="FormButton" name="FormButton"
                     class="btn btn-primary" value="Add">
                 Add
@@ -146,5 +136,7 @@
                 Clear
             </button>
         </div>
-    </div>
-</form>
+    </form>
+</fieldset>
+
+
