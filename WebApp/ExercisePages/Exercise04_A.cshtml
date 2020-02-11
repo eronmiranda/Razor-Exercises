@@ -1,0 +1,66 @@
+﻿@{
+    Layout = "~/_Layout.cshtml";
+    Page.Title = "Exercise04_A - Search";
+
+    var albumSearch = Request.Form["AlbumSearch"];
+    var theButton = Request.Form["theButton"];
+
+    var db = Database.Open("ChinookDB");
+    var albumQuery = @"SELECT AlbumId, Title, ArtistId, ReleaseYear, ReleaseLabel 
+                        FROM Albums
+                        WHERE Title like @0";
+
+    var partialString = "%" + albumSearch + "%";
+
+    var albumResults = db.Query(albumQuery, partialString);
+
+}
+@section banner {
+    <h1>@Page.Title</h1>
+}
+<div class="col-sm-8">
+    @if (IsPost)
+    {
+        if (theButton.Equals("reset"))
+        {
+            <p style="color:darkblue">The Reset Button was just Pressed</p>
+            albumSearch = "";
+        }
+        else
+        {
+            if (albumSearch.IsEmpty())
+            {
+                <p><strong><span style="color:firebrick">Enter a product name (or partial name).</span></strong></p>
+            }
+            else
+            {
+
+                if (albumResults.Count() == 0)
+                {
+                    <p><strong><span style="color:firebrick">Nothing found for search argument.</span></strong></p>
+                }
+                else
+                {
+                    <p>@albumResults.Count() found in the database.</p>
+                    //Response.Redirect("ProductWebGridDisplay.cshtml?cid=" + albumSearch);
+
+                }
+            }
+        }
+    }
+    else
+    {
+        albumSearch = "";
+    }
+</div>
+
+<form id="theForm" action="" method="post">
+    <div class="col-sm-3">
+        <label id="forAlbumSearch">Album Name</label><br />
+        <input type="text" name="AlbumSearch" value="@albumSearch"><br /><br />
+        <button type="submit" class="btn btn-primary" name="Search" id="theSearch">Search</button>
+        <button type="submit" id="theButton" name="theButton" value="reset" class="btn btn-light">
+            Reset
+        </button>
+    </div><br />
+</form>
