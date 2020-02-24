@@ -1,6 +1,6 @@
 ﻿@{
     Layout = "~/_Layout.cshtml";
-    Page.Title = "Exercise04_A - Search";
+    Page.Title = "Exercise04_A - Search and WebGrid Display";
 
     var albumSearch = Request.Form["AlbumSearch"];
     var theButton = Request.Form["theButton"];
@@ -14,10 +14,24 @@
 
     var albumResults = db.Query(albumQuery, partialString);
 
+    var grid = new WebGrid(albumResults, rowsPerPage: 10);
+
 }
 @section banner {
     <h1>@Page.Title</h1>
 }
+
+<form id="theForm" action="" method="post">
+    <div class="col-sm-3">
+        <label id="forAlbumSearch">Album Name</label><br />
+        <input type="text" name="AlbumSearch" value="@albumSearch"><br /><br />
+        <button type="submit" class="btn btn-primary" name="theButton" id="theSearch">Search</button>
+        <button type="submit" id="theButton" name="theButton" value="reset" class="btn btn-light">
+            Reset
+        </button>
+    </div><br />
+</form>
+
 <div class="col-sm-8">
     @if (IsPost)
     {
@@ -25,6 +39,7 @@
         {
             <p style="color:darkblue">The Reset Button was just Pressed</p>
             albumSearch = "";
+            //grid = new WebGrid();
         }
         else
         {
@@ -42,8 +57,22 @@
                 else
                 {
                     <p>@albumResults.Count() found in the database.</p>
-                    //Response.Redirect("ProductWebGridDisplay.cshtml?cid=" + albumSearch);
-
+                    //Response.Redirect("Exercise04_B.cshtml?albumId=" + albumSearch);
+                    <div class="offset-1">
+                        <div class="col-11">
+                            @grid.GetHtml("table table-bordered table-striped table-hover",
+                            mode: WebGridPagerModes.All,
+                            lastText: "Last",
+                            firstText: "First",
+                            columns: grid.Columns(
+                                grid.Column(columnName: "AlbumId", header: "ID"),
+                                grid.Column(columnName: "Title", header: "Title"),
+                                grid.Column(columnName: "ArtistId", header: "Artist ID"),
+                                grid.Column(columnName: "ReleaseYear", header: "Year"),
+                                grid.Column(columnName: "ReleaseLabel", header: "Label"),
+                                grid.Column(header: "", format: @<text><a href="~/ExercisePages/Exercise04_B.cshtml?AlbumId=@item.AlbumId">Edit</a></text>)))
+                        </div>
+                    </div>
                 }
             }
         }
@@ -53,14 +82,3 @@
         albumSearch = "";
     }
 </div>
-
-<form id="theForm" action="" method="post">
-    <div class="col-sm-3">
-        <label id="forAlbumSearch">Album Name</label><br />
-        <input type="text" name="AlbumSearch" value="@albumSearch"><br /><br />
-        <button type="submit" class="btn btn-primary" name="Search" id="theSearch">Search</button>
-        <button type="submit" id="theButton" name="theButton" value="reset" class="btn btn-light">
-            Reset
-        </button>
-    </div><br />
-</form>
